@@ -65,6 +65,7 @@ namespace Assets.Scripts.Movement
         {
             collider.enabled = false;
             collider.enabled = true;
+            Depenetrate();
         }
 
         public void Move(Vector3 translation)
@@ -72,34 +73,26 @@ namespace Assets.Scripts.Movement
             Vector3 startPosition;
 
             //Initialise variables
-            {
-                startPosition = rb.position;
-                m_upDirection = transform.up;
-                _translation = translation;
-                stepTranslation = Vector3.zero;
-                isGrounded = false;
-                isOnSlope = false;
-                stepped = false;
+            
+            startPosition = rb.position;
+            m_upDirection = transform.up;
+            _translation = translation;
+            stepTranslation = Vector3.zero;
+            isGrounded = false;
+            isOnSlope = false;
+            stepped = false;
 
-                // If we are not rising, we can set grounded at the start which is useful in CapsuleSweep
-                // (in addition, we set grounded based on all collisions post movement step)
-                // (not sure that part is necessary or helpful!)
-                if (_translation.y <= 0)
+            // If we are not rising, we can set grounded at the start which is useful in CapsuleSweep
+            // (in addition, we set grounded based on all collisions post movement step)
+            // (not sure that part is necessary or helpful!)
+            if (_translation.y <= 0)
+            {
+                if (rb.SweepTest(Vector3.down, out RaycastHit hit, skinWidth + 0.01f, QueryTriggerInteraction.Ignore))
                 {
-                    RaycastHit hit;
-                    if (
-                        rb.SweepTest(
-                            Vector3.down,
-                            out hit,
-                            skinWidth + 0.01f,
-                            QueryTriggerInteraction.Ignore
-                        )
-                    )
-                    {
-                        SetGroundedAndSlopeState(hit.normal);
-                    }
+                    SetGroundedAndSlopeState(hit.normal);
                 }
             }
+            
 
             //Collide and Slide
             if (_translation.sqrMagnitude > MinMoveDistance)

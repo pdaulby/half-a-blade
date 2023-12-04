@@ -2120,6 +2120,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1458030258}
   - component: {fileID: 1458030259}
+  - component: {fileID: 1458030260}
   m_Layer: 0
   m_Name: CharacterController
   m_TagString: Untagged
@@ -2154,6 +2155,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82792478a8912c24faa4771b71881405, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  orientation: {fileID: 4819750369556972332}
+  characterController: {fileID: 4819750370334471337}
+--- !u!114 &1458030260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458030257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83be0f27901f5be4d9bfc0e04fef4ee3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camUpDown: {fileID: 4819750369839684782}
+  orientation: {fileID: 4819750370334471328}
+  mouseSensitivityVert: 3
+  mouseSensitivityHorz: 3
 --- !u!1 &1512293473
 GameObject:
   m_ObjectHideFlags: 0
@@ -2976,14 +2995,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4a6d2124999ac8428ccd214d5d53f4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jump: 5
+  jump: 6
   gravity: 9.8
-  mouseSensitivityVert: 3
-  mouseSensitivityHorz: 3
   camUpDown: {fileID: 4819750369839684782}
-  orientation: {fileID: 4819750369556972332}
+  orientation: {fileID: 4819750370334471328}
   characterController: {fileID: 4819750370334471337}
-  lockMovement: 0
+  Speed: 4
 --- !u!114 &4819750370334471337
 MonoBehaviour:
   m_ObjectHideFlags: 0
