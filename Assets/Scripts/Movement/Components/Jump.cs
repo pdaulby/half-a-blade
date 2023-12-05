@@ -8,13 +8,13 @@ namespace Assets.Scripts.Movement.Components
     {
         public float jump = 6;
 
-        public override void DoUpdate(FixedInput input, PlayerController playerController)
+        public override void DoUpdate(FixedInput input, PlayerController controller)
         {
             if (!input.Jump.Pressed) return;
 
-            if (playerController.IsGrounded)
+            if (controller.IsGrounded)
             {
-                playerController.Velocity += playerController.transform.up * jump;
+                controller.Velocity += controller.transform.up * jump;
             }
             //todo slope limit
             //todo use proper up

@@ -10,11 +10,6 @@ namespace Assets.Scripts.Movement
         public Transform orientation = default;
         public KinematicBody3 characterController = default;
 
-        private float verticalInput = 0;
-        private float horzInput = 0;
-
-        public float Speed = 4; 
-
         void Update()
         {
             if (Pause.paused)
@@ -22,18 +17,7 @@ namespace Assets.Scripts.Movement
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            verticalInput = Input.GetAxisRaw("Vertical");
-            horzInput = Input.GetAxisRaw("Horizontal");
 
-        }
-
-        void FixedUpdate()
-        {
-            Vector3 horz =
-                (orientation.forward * verticalInput + orientation.right * horzInput).normalized
-                * Speed;
-
-            characterController.Move(horz * Time.deltaTime);
         }
 
         public void SetPosition(Vector3 position)

@@ -6,12 +6,12 @@ namespace Assets.Scripts.Movement.Components
 {
     public abstract class ControllerComponent : MonoBehaviour
     {
-        public virtual bool CanUse(PlayerController playerController)
+        public virtual bool CanUse(PlayerController controller)
         {
             //TODO
             return true; 
         }
 
-        public abstract void DoUpdate(FixedInput input, PlayerController playerController);
+        public abstract void DoUpdate(FixedInput input, PlayerController controller);
     }
 }

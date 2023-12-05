@@ -2123,6 +2123,7 @@ GameObject:
   - component: {fileID: 1458030260}
   - component: {fileID: 1458030261}
   - component: {fileID: 1458030262}
+  - component: {fileID: 1458030263}
   m_Layer: 0
   m_Name: CharacterController
   m_TagString: Untagged
@@ -2201,6 +2202,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jump: 6
+--- !u!114 &1458030263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458030257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26629dd95fcf58444bd320dd8d5330eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Speed: 8
 --- !u!1 &1512293473
 GameObject:
   m_ObjectHideFlags: 0
@@ -3026,7 +3040,6 @@ MonoBehaviour:
   camUpDown: {fileID: 4819750369839684782}
   orientation: {fileID: 4819750370334471328}
   characterController: {fileID: 4819750370334471337}
-  Speed: 4
 --- !u!114 &4819750370334471337
 MonoBehaviour:
   m_ObjectHideFlags: 0
