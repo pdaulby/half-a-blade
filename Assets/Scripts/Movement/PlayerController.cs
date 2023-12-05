@@ -1,5 +1,7 @@
-﻿using Assets.Scripts.Movement.Inputs;
+﻿using Assets.Scripts.Movement.Components;
+using Assets.Scripts.Movement.Inputs;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts.Movement
@@ -10,8 +12,23 @@ namespace Assets.Scripts.Movement
         public Transform orientation = default;
         public KinematicBody3 characterController = default;
 
+        private ControllerComponent[] components;
         private InputReader inputReader = new();
-        public FixedInput input { get; private set; } = new();
+        private FixedInput input = new();
+
+        public Vector3 Velocity { get; set; } = new();
+        public Vector3 PreviousVelocity { get; private set; } = new();
+        public Vector3 PreviousPosition { get; private set; } = new();
+
+        // stuff from controller, move I guess
+        public Vector3 ActualVelocity { get { return characterController.velocity; } }
+        public bool IsGrounded { get { return characterController.isGrounded; } }
+        public Collider GroundedCollider { get { return null; } }
+
+        private void Awake()
+        {
+            components = GetComponents<ControllerComponent>();
+        }
 
         void Update()
         {
@@ -20,7 +37,14 @@ namespace Assets.Scripts.Movement
 
         void FixedUpdate()
         {
+            PreviousPosition = characterController.transform.position;
             input = inputReader.GetNext();
+
+            components.Where(c => c.CanUse(this)).ToList()
+                .ForEach(c => c.DoUpdate(input, this));
+
+            characterController.Move(Velocity * Time.deltaTime);
+            PreviousVelocity = Velocity;
         }
     }
 }

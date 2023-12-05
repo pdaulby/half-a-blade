@@ -104,35 +104,25 @@ namespace Assets.Scripts.Movement
                 lateralTranslation = transform.TransformDirection(lateralTranslation);
                 verticalTranslation = transform.TransformDirection(verticalTranslation);
 
-                CapsuleSweep(
-                    SweepType.LATERAL,
-                    lateralTranslation.normalized,
-                    lateralTranslation.magnitude
-                );
+                CapsuleSweep(SweepType.LATERAL, lateralTranslation.normalized, lateralTranslation.magnitude);
 
-                CapsuleSweep(
-                    SweepType.VERTICAL,
-                    verticalTranslation.normalized,
-                    verticalTranslation.magnitude
-                );
+                CapsuleSweep(SweepType.VERTICAL, verticalTranslation.normalized, verticalTranslation.magnitude);
             }
 
             Depenetrate();
 
             // Move
             // Resetting position and using Move Position so interpolation is respected
-            {
-                Vector3 m_position = rb.position;
-                rb.position = startPosition;
-                _translation = m_position - startPosition;
-                _translation -= stepTranslation;
-                velocity = _translation / Time.deltaTime;
+            Vector3 m_position = rb.position;
+            rb.position = startPosition;
+            _translation = m_position - startPosition;
+            _translation -= stepTranslation;
+            velocity = _translation / Time.deltaTime;
 
-                // Causes some strange behaviour - nested objects getting out of sync
-                // Might be due to nested rigidbodies
-                // rb.MovePosition(m_position);
-                rb.position = m_position;
-            }
+            // Causes some strange behaviour - nested objects getting out of sync
+            // Might be due to nested rigidbodies
+            // rb.MovePosition(m_position);
+            rb.position = m_position;
         }
 
         public void Depenetrate()
@@ -146,56 +136,44 @@ namespace Assets.Scripts.Movement
                 QueryTriggerInteraction.Ignore
             );
 
-            if (overlapsNum > 0)
+            for (int i = 0; i < overlapsNum; i++)
             {
-                for (int i = 0; i < overlapsNum; i++)
-                {
-                    var otherCollider = m_overlaps[i];
+                var otherCollider = m_overlaps[i];
 
-                    if (otherCollider == collider)
-                        continue; // skip ourself
+                if (otherCollider == collider)
+                    continue; // skip ourself
 
-                    if (Physics.GetIgnoreLayerCollision(gameObject.layer, otherCollider.gameObject.layer))
-                        continue;
+                if (Physics.GetIgnoreLayerCollision(gameObject.layer, otherCollider.gameObject.layer))
+                    continue;
 
-                    Vector3 otherPosition = otherCollider.gameObject.transform.position;
-                    Quaternion otherRotation = otherCollider.gameObject.transform.rotation;
+                Vector3 otherPosition = otherCollider.gameObject.transform.position;
+                Quaternion otherRotation = otherCollider.gameObject.transform.rotation;
 
-                    Vector3 direction;
-                    float distance;
-
-                    int iterations = 0;
-                    // Unity docs says penetration is one and done:
-                    //    https://docs.unity3d.com/ScriptReference/Physics.ComputePenetration.html
-                    // Some random issue response *implies* it should be used iteratively:
-                    //    https://issuetracker.unity3d.com/issues/physics-dot-computepenetration-returns-incorrect-distance-and-direction-when-box-collider-with-a-non-convex-mesh-collider-is-used
-                    // So yolo we're using it iteratively
-                    while (
-                        Physics.ComputePenetration(
-                            collider,
-                            rb.position + collider.transform.localPosition,
-                            rb.rotation * collider.transform.localRotation,
-                            otherCollider,
-                            otherPosition,
-                            otherRotation,
-                            out direction,
-                            out distance
-                        )
+                int iterations = 0;
+                // Unity docs says penetration is one and done:
+                //    https://docs.unity3d.com/ScriptReference/Physics.ComputePenetration.html
+                // Some random issue response *implies* it should be used iteratively:
+                //    https://issuetracker.unity3d.com/issues/physics-dot-computepenetration-returns-incorrect-distance-and-direction-when-box-collider-with-a-non-convex-mesh-collider-is-used
+                // So yolo we're using it iteratively
+                while (
+                    Physics.ComputePenetration(
+                        collider,
+                        rb.position + collider.transform.localPosition,
+                        rb.rotation * collider.transform.localRotation,
+                        otherCollider,
+                        otherPosition,
+                        otherRotation,
+                        out Vector3 direction,
+                        out float distance)
                     )
+                {
+                    iterations++;
+                    if (iterations > 10)
                     {
-                        iterations++;
-
-                        if (iterations > 10)
-                        {
-                            Debug.LogWarning("Unable to depenetrate");
-                            break;
-                        }
-                        rb.position += direction * (distance + skinWidth);
+                        Debug.LogWarning("Unable to depenetrate");
+                        break;
                     }
-                    if (iterations > 0)
-                    {
-                        //Debug.Log("Depenetrated");
-                    }
+                    rb.position += direction * (distance + skinWidth);
                 }
             }
         }
@@ -219,16 +197,13 @@ namespace Assets.Scripts.Movement
         public void CapsuleSweep(SweepType sweepType, Vector3 direction, float remainingDistance)
         {
             Vector3 initialDirection = direction;
-            RaycastHit hitInfo;
             RaycastHit stepRaisedHitInfo = default;
-            RaycastHit stepDownHitInfo = default;
             RaycastHit lastUsedHitInfo = default;
             Vector3 preSweepPositionGround;
             Vector3 preSweepPositionStep = default;
             bool collision;
             bool stepRaisedCollision;
             bool stepDownCollision;
-            float lastIterationDistance = 0;
 
             //For Vertical, blocking angle is between 0 - slopeLimit
             //For Lateral, blocking angle is slopeLimit - 90 (grounded) or 360 (not grounded)
@@ -244,12 +219,7 @@ namespace Assets.Scripts.Movement
                     break;
 
                 preSweepPositionGround = rb.position;
-                collision = rb.SweepTest(
-                    direction.normalized,
-                    out hitInfo,
-                    remainingDistance + skinWidth,
-                    QueryTriggerInteraction.Ignore
-                );
+                collision = rb.SweepTest(direction.normalized, out RaycastHit hitInfo, remainingDistance + skinWidth, QueryTriggerInteraction.Ignore);
 
                 // The Step algorithm nudges the character up; let's the character move; then nudes them back down
                 // It only makes sense for lateral movement
@@ -261,10 +231,9 @@ namespace Assets.Scripts.Movement
                     float nudgeUpDistance = stepOffset;
 
                     // How far up can we nudge the character? (is there a ceiling blocking upward nudging)
-                    RaycastHit nudgeUpHitInfo;
                     rb.SweepTest(
                         m_upDirection,
-                        out nudgeUpHitInfo,
+                        out RaycastHit nudgeUpHitInfo,
                         stepOffset,
                         QueryTriggerInteraction.Ignore
                     );
@@ -283,28 +252,19 @@ namespace Assets.Scripts.Movement
                     );
 
                     rb.position += direction.normalized * remainingDistance;
-                    stepDownCollision = rb.SweepTest(
-                        -m_upDirection,
-                        out stepDownHitInfo,
-                        stepOffset + skinWidth,
-                        QueryTriggerInteraction.Ignore
-                    );
+                    stepDownCollision = rb.SweepTest(-m_upDirection, out RaycastHit stepDownHitInfo, stepOffset + skinWidth, QueryTriggerInteraction.Ignore);
 
                     bool stepRaisedAvoidedCollision = !stepRaisedCollision && collision;
-                    bool stepCollidedFurther =
-                        stepRaisedCollision
+                    bool stepCollidedFurther = stepRaisedCollision
                         && collision
                         && stepRaisedHitInfo.distance > hitInfo.distance + 0.001;
-                    bool stepRaisedHitSteepSlope =
-                        stepRaisedCollision
+                    bool stepRaisedHitSteepSlope = stepRaisedCollision
                         && Vector3.Angle(m_upDirection, stepRaisedHitInfo.normal) >= slopeLimit;
-                    bool stepDownHitSteepSlope =
-                        stepDownCollision
+                    bool stepDownHitSteepSlope =  stepDownCollision
                         && Vector3.Angle(m_upDirection, stepDownHitInfo.normal) >= slopeLimit;
                     bool walkHitShallowSlope =
                         collision && Vector3.Angle(m_upDirection, hitInfo.normal) < slopeLimit;
-                    bool stepWentHigher =
-                        stepDownCollision && stepDownHitInfo.distance < nudgeUpDistance;
+                    bool stepWentHigher = stepDownCollision && stepDownHitInfo.distance < nudgeUpDistance;
 
                     doStep =
                         !walkHitShallowSlope
@@ -321,62 +281,49 @@ namespace Assets.Scripts.Movement
                 }
 
                 // Do the movement
-                {
-                    RaycastHit iterationUsingHitInfo = doStep ? stepRaisedHitInfo : hitInfo;
-                    rb.position = doStep ? preSweepPositionStep : preSweepPositionGround; // If stepping it's already in the right place
+                RaycastHit iterationUsingHitInfo = doStep ? stepRaisedHitInfo : hitInfo;
+                rb.position = doStep ? preSweepPositionStep : preSweepPositionGround; // If stepping it's already in the right place
+                float lastIterationDistance = IterateMovement(
+                    sweepType,
+                    iterationUsingHitInfo,
+                    lastUsedHitInfo,
+                    initialDirection,
+                    ref direction,
+                    ref remainingDistance,
+                    minBlockAngle,
+                    maxBlockAngle
+                );
+                lastUsedHitInfo = iterationUsingHitInfo;
+                
+                //Clamp rigibody back down if necessary
+                float downDistance = 0;
 
-                    lastIterationDistance = IterateMovement(
-                        sweepType,
-                        iterationUsingHitInfo,
-                        lastUsedHitInfo,
-                        initialDirection,
-                        ref direction,
-                        ref remainingDistance,
-                        minBlockAngle,
-                        maxBlockAngle
-                    );
-                    lastUsedHitInfo = iterationUsingHitInfo;
+                if (isGrounded && !isOnSlope)
+                {
+                    downDistance += snapToFloorOffset;
                 }
 
-                //Clamp rigibody back down if necessary
+                if (doStep)
                 {
-                    float downDistance = 0;
+                    downDistance += stepOffset;
+                }
 
-                    if (isGrounded && !isOnSlope)
+                if (downDistance > 0)
+                {
+                    if (rb.SweepTest(Vector3.down,  out RaycastHit clampDownHitInfo, downDistance, QueryTriggerInteraction.Ignore)
+                        // Don't clamp if steep slope!
+                        && Vector3.Angle(m_upDirection, clampDownHitInfo.normal) < slopeLimit)
                     {
-                        downDistance += snapToFloorOffset;
+                        downDistance = Mathf.Max(0, clampDownHitInfo.distance - skinWidth);
+                        rb.position += Vector3.down * downDistance;
+
+                        stepTranslation += Vector3.down * downDistance;
                     }
-
-                    if (doStep)
+                    else
                     {
-                        downDistance += stepOffset;
-                    }
-
-                    if (downDistance > 0)
-                    {
-                        RaycastHit clampDownHitInfo;
-                        if (
-                            rb.SweepTest(
-                                Vector3.down,
-                                out clampDownHitInfo,
-                                downDistance,
-                                QueryTriggerInteraction.Ignore
-                            )
-                            // Don't clamp if steep slope!
-                            && Vector3.Angle(m_upDirection, clampDownHitInfo.normal) < slopeLimit
-                        )
-                        {
-                            downDistance = Mathf.Max(0, clampDownHitInfo.distance - skinWidth);
-                            rb.position += Vector3.down * downDistance;
-
-                            stepTranslation += Vector3.down * downDistance;
-                        }
-                        else
-                        {
-                            //This should be rare:
-                            //  When stepping entirely over something
-                            //  When clamping to a ramp that ends in a drop
-                        }
+                        //This should be rare:
+                        //  When stepping entirely over something
+                        //  When clamping to a ramp that ends in a drop
                     }
                 }
             }
@@ -390,8 +337,7 @@ namespace Assets.Scripts.Movement
             ref Vector3 direction,
             ref float distance,
             float minBlockAngle,
-            float maxBlockAngle
-        )
+            float maxBlockAngle)
         {
             // How much it is possible to move without hitting the next collider (if next collider even exists)
             float safeDistance = distance;
@@ -408,115 +354,97 @@ namespace Assets.Scripts.Movement
                 distance -= safeDistance;
             }
 
+            if (hitInfo.collider == null)
+                return safeDistance;
+            
             // If there was a next collider; figure out what the next direction will be
-            if (hitInfo.collider != null)
+            // Default: project direction straight into the plane of the hit surface
+            Vector3 projectionNormal = hitInfo.normal;
+
+            float surfaceAngle = Vector3.Angle(m_upDirection, hitInfo.normal) - 0.001f;
+
+            // If hitting a slope actually use the plane adjusted for the players direction
+            // (i.e. force the final direction to align with players input direction)
+            if (sweepType == SweepType.LATERAL && surfaceAngle < 90)
             {
-                // Default: project direction straight into the plane of the hit surface
-                Vector3 projectionNormal = hitInfo.normal;
-
-                float surfaceAngle = Vector3.Angle(m_upDirection, hitInfo.normal) - 0.001f;
-
-                // If hitting a slope actually use the plane adjusted for the players direction
-                // (i.e. force the final direction to align with players input direction)
-                if (sweepType == SweepType.LATERAL && surfaceAngle < 90)
-                {
-                    projectionNormal = KinematicBodyMath.RelativeSlopeNormal(
-                        direction.Horizontal(),
-                        hitInfo.normal
-                    );
-                }
-
-                // Do even more fancy things if it's a "blocking" surface
-                if ((surfaceAngle >= minBlockAngle) && (surfaceAngle <= maxBlockAngle))
-                {
-                    if (sweepType == SweepType.LATERAL)
-                    {
-                        // Default for blocking slope is to "wall off" along the slope
-                        projectionNormal = new Vector3(hitInfo.normal.x, 0, hitInfo.normal.z);
-
-                        // Ground / Slope case: figure out the plane lines up the direction
-                        // with the seam between ground and slope
-                        if (
-                            isGrounded
-                            && Vector3.Angle(hitInfo.normal, Vector3.up) < 90
-                            && (
-                                // If same normal is hit twice, the seam algorithm is stuck
-                                // So try to just default projectionNormal
-                                // (happens at the top of slopes)
-                                lastUsedHitInfo.collider == null
-                                || lastUsedHitInfo.normal != hitInfo.normal
-                            )
-                        )
-                        {
-                            var seam = Vector3.Cross(hitInfo.normal, groundedNormal);
-                            projectionNormal = new Plane(Vector3.zero, seam, seam + Vector3.up).normal;
-                        }
-                        // Ceiling / Ground squeeze case: figure out the plane that lines up the direction
-                        // Out of a ground and ceiling that are squeezing together
-                        else if (
-                            isGrounded
-                            && Vector3.Angle(hitInfo.normal, Vector3.up) > 90
-                            && (
-                                // Same as above; I'm less confident about how this happens
-                                // but it seemed to smooth things out
-                                lastUsedHitInfo.collider == null
-                                || lastUsedHitInfo.normal != hitInfo.normal
-                            )
-                        )
-                        {
-                            // Experimental algorithm: I noticed that when the floor is flat
-                            // Squeezing ceilings work correctly
-                            // So when the floor is not flat, figure out what rotation would make it so,
-                            // Apply that to the ceiling; work out the appropriate plane,
-                            // Then rotate it back.
-                            // I'm not totally confident in it
-                            var rotation = Quaternion.FromToRotation(groundedNormal, Vector3.up);
-                            var rotatedHitNormal = rotation * hitInfo.normal;
-                            projectionNormal = new Vector3(rotatedHitNormal.x, 0, rotatedHitNormal.z);
-                            projectionNormal = Quaternion.Inverse(rotation) * projectionNormal;
-                        }
-                    }
-                    // For vertical sweeps, just block any downward movement when on a slope
-                    if (sweepType == SweepType.VERTICAL)
-                    {
-                        projectionNormal = Vector3.up;
-                    }
-                }
-
-                /**
-             * A bit confusing, I think!
-             * 
-             * For some situations such as climbing a ramp while also sort of strafing into a wall, it is important
-             * that the 'collide and slide' off one follows the 'collide and slide' off the other. 
-             * 
-             * In some situations, such as running into a corner between 90-180 degrees, the collide and slides should converge
-             * into each other.
-             */
-                var continueDirection = Vector3.ProjectOnPlane(direction, projectionNormal);
-                var initialInfluenceDirection = Vector3.ProjectOnPlane(
-                    initialDirection,
-                    projectionNormal
-                );
-
-                direction =
-                    Vector3.Dot(continueDirection, initialDirection) < 0
-                        ? initialInfluenceDirection
-                        : continueDirection;
+                projectionNormal = KinematicBodyMath.RelativeSlopeNormal(direction.Horizontal(), hitInfo.normal);
             }
+
+            // Do even more fancy things if it's a "blocking" surface
+            if ((surfaceAngle >= minBlockAngle) && (surfaceAngle <= maxBlockAngle))
+            {
+                if (sweepType == SweepType.LATERAL)
+                {
+                    // Default for blocking slope is to "wall off" along the slope
+                    projectionNormal = new Vector3(hitInfo.normal.x, 0, hitInfo.normal.z);
+
+                    // Ground / Slope case: figure out the plane lines up the direction
+                    // with the seam between ground and slope
+                    if (isGrounded
+                        && Vector3.Angle(hitInfo.normal, Vector3.up) < 90
+                        // If same normal is hit twice, the seam algorithm is stuck
+                        // So try to just default projectionNormal
+                        // (happens at the top of slopes)
+                        && (lastUsedHitInfo.collider == null
+                            || lastUsedHitInfo.normal != hitInfo.normal))
+                    {
+                        var seam = Vector3.Cross(hitInfo.normal, groundedNormal);
+                        projectionNormal = new Plane(Vector3.zero, seam, seam + Vector3.up).normal;
+                    }
+                    // Ceiling / Ground squeeze case: figure out the plane that lines up the direction
+                    // Out of a ground and ceiling that are squeezing together
+                    else if (isGrounded
+                        && Vector3.Angle(hitInfo.normal, Vector3.up) > 90
+                        // Same as above; I'm less confident about how this happens
+                        // but it seemed to smooth things out
+                        && (lastUsedHitInfo.collider == null
+                            || lastUsedHitInfo.normal != hitInfo.normal))
+                    {
+                        // Experimental algorithm: I noticed that when the floor is flat
+                        // Squeezing ceilings work correctly
+                        // So when the floor is not flat, figure out what rotation would make it so,
+                        // Apply that to the ceiling; work out the appropriate plane,
+                        // Then rotate it back.
+                        // I'm not totally confident in it
+                        var rotation = Quaternion.FromToRotation(groundedNormal, Vector3.up);
+                        var rotatedHitNormal = rotation * hitInfo.normal;
+                        projectionNormal = new Vector3(rotatedHitNormal.x, 0, rotatedHitNormal.z);
+                        projectionNormal = Quaternion.Inverse(rotation) * projectionNormal;
+                    }
+                }
+                // For vertical sweeps, just block any downward movement when on a slope
+                if (sweepType == SweepType.VERTICAL)
+                {
+                    projectionNormal = Vector3.up;
+                }
+            }
+
+            /**
+            * A bit confusing, I think!
+            * 
+            * For some situations such as climbing a ramp while also sort of strafing into a wall, it is important
+            * that the 'collide and slide' off one follows the 'collide and slide' off the other. 
+            * 
+            * In some situations, such as running into a corner between 90-180 degrees, the collide and slides should converge
+            * into each other.
+            */
+            var continueDirection = Vector3.ProjectOnPlane(direction, projectionNormal);
+            var initialInfluenceDirection = Vector3.ProjectOnPlane(initialDirection, projectionNormal);
+
+            direction = Vector3.Dot(continueDirection, initialDirection) < 0
+                    ? initialInfluenceDirection
+                    : continueDirection;
 
             return safeDistance;
         }
 
         public bool SetYScalePosition(float newYScale, float newYPosition, bool force = false)
         {
-            RaycastHit downHit;
-            bool didDownHit = rb.SweepTest(Vector3.down, out downHit);
+            bool didDownHit = rb.SweepTest(Vector3.down, out RaycastHit downHit);
 
-            RaycastHit upHit;
-            bool didUpHit = rb.SweepTest(Vector3.up, out upHit);
+            bool didUpHit = rb.SweepTest(Vector3.up, out RaycastHit upHit);
 
             Vector3 oldboundMin = collider.bounds.min;
-            Vector3 oldboundMax = collider.bounds.max;
 
             Vector3 oldPos = collider.transform.localPosition;
             Vector3 oldScale = collider.transform.localScale;

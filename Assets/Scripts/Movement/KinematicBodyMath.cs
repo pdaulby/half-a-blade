@@ -24,11 +24,7 @@ namespace Assets.Scripts.Movement
         private static Vector3 RelativeSlopeNormal(Vector3 horizontal, Vector3 slopeNormal, Vector3 up)
         {
             Vector3 slopeVector = HorizontalToSlopeGradient(horizontal, slopeNormal, up);
-            return Vector3.SlerpUnclamped(
-                slopeVector,
-                up,
-                90 / Vector3.Angle(slopeVector, up)
-            ).normalized;
+            return Vector3.SlerpUnclamped(slopeVector, up, 90 / Vector3.Angle(slopeVector, up)).normalized;
         }
 
         private static Vector3 HorizontalToSlopeGradient(Vector3 horizontal, Vector3 slopeNormal)
