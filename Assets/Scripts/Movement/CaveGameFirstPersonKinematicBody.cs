@@ -16,8 +16,6 @@ namespace Assets.Scripts.Movement
                 return; 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-
-
         }
 
         public void SetPosition(Vector3 position)

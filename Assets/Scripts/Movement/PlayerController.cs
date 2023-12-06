@@ -24,6 +24,8 @@ namespace Assets.Scripts.Movement
         public Vector3 ActualVelocity { get { return characterController.velocity; } }
         public bool IsGrounded { get { return characterController.isGrounded; } }
         public Collider GroundedCollider { get { return null; } }
+        public Vector3 GroundedNormal { get { return characterController.groundedNormal; } }
+        public float SlopeAngle { get { return characterController.slopeAngle; } }
 
         private void Awake()
         {

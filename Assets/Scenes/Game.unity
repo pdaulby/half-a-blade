@@ -1044,7 +1044,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4819750370334471328}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &697424704
 GameObject:
@@ -2124,6 +2124,7 @@ GameObject:
   - component: {fileID: 1458030261}
   - component: {fileID: 1458030262}
   - component: {fileID: 1458030263}
+  - component: {fileID: 1458030264}
   m_Layer: 0
   m_Name: CharacterController
   m_TagString: Untagged
@@ -2158,7 +2159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82792478a8912c24faa4771b71881405, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  orientation: {fileID: 4819750369556972332}
+  orientation: {fileID: 4819750370334471328}
   characterController: {fileID: 4819750370334471337}
 --- !u!114 &1458030260
 MonoBehaviour:
@@ -2188,6 +2189,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8de9ebe17cb43c84ea010c6401e530f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Grounded: 0
+  SlopeMin: 0
+  SlopeMax: 0
   gravity: 9.8
 --- !u!114 &1458030262
 MonoBehaviour:
@@ -2201,6 +2205,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c67950c702932cc489a029221a937125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Grounded: 1
+  SlopeMin: 0
+  SlopeMax: 45.1
   jump: 6
 --- !u!114 &1458030263
 MonoBehaviour:
@@ -2214,6 +2221,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26629dd95fcf58444bd320dd8d5330eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Grounded: 1
+  SlopeMin: 0
+  SlopeMax: 45.1
+  Speed: 8
+--- !u!114 &1458030264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458030257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26629dd95fcf58444bd320dd8d5330eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Grounded: 2
+  SlopeMin: 0
+  SlopeMax: 0
   Speed: 8
 --- !u!1 &1512293473
 GameObject:
@@ -2826,7 +2852,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4819750370334471328}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4819750368517656375
 GameObject:
@@ -2866,10 +2892,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4819750369839684782}
+  m_Children: []
   m_Father: {fileID: 4819750370334471328}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4819750369556972333
 GameObject:
@@ -2925,8 +2950,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4819750369556972332}
-  m_RootOrder: 0
+  m_Father: {fileID: 4819750370334471328}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &4819750369839684783
 Camera:
@@ -2984,6 +3009,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1458030258}
+  - {fileID: 4819750369839684782}
   - {fileID: 4819750369556972332}
   - {fileID: 4819750368517656374}
   - {fileID: 598705895}

@@ -35,4 +35,9 @@ public class Pause : MonoBehaviour
         Time.timeScale = 1;
         menus.ClearMenus();
     }
+
+    private void OnApplicationQuit()
+    {
+        paused = false;
+    }
 }

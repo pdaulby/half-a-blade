@@ -40,6 +40,7 @@ namespace Assets.Scripts.Movement
 
         public bool isOnSlope { get; private set; }
         public Vector3 slopeNormal { get; private set; }
+        public float slopeAngle { get; private set; }
 
         private Rigidbody rb;
 
@@ -180,14 +181,14 @@ namespace Assets.Scripts.Movement
 
         private void SetGroundedAndSlopeState(Vector3 contactNormal)
         {
-            float angle = Vector3.Angle(m_upDirection, contactNormal);
+            slopeAngle = Vector3.Angle(m_upDirection, contactNormal);
 
-            if (angle <= slopeLimit)
+            if (slopeAngle <= slopeLimit)
             {
                 isGrounded = true;
                 groundedNormal = contactNormal;
             }
-            else if (angle >= slopeLimit && angle < 90)
+            else if (slopeAngle >= slopeLimit && slopeAngle < 90)
             {
                 isOnSlope = true;
                 slopeNormal = contactNormal;
