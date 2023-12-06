@@ -13,10 +13,16 @@ namespace Assets.Scripts.Movement.Components
         {
             if (controller.IsGrounded)
             {
-                controller.Velocity = new(controller.Velocity.x, 0, controller.Velocity.z);
-                //Vector3 landedDirection = controller.Velocity.normalized + controller.GroundedNormal.normalized;
-                //controller.Velocity = landedDirection * controller.Velocity.magnitude;
-                // ActualVelocity
+                //controller.Velocity = new(controller.Velocity.x, 0, controller.Velocity.z);
+                var c1 = Vector3.Cross(controller.GroundedNormal, -controller.Velocity);
+                var tangent = Vector3.Cross(controller.GroundedNormal, c1).normalized;
+                var dot = Vector3.Dot(controller.Velocity.normalized, tangent);
+                Debug.DrawRay(transform.position, c1.normalized, Color.red, 1);
+                Debug.DrawRay(transform.position, tangent*controller.Velocity.magnitude, Color.green, 1);
+                Debug.Log(dot);
+                Vector3 landedDirection = controller.Velocity.magnitude * dot * tangent;
+                controller.Velocity = landedDirection;
+                //ActualVelocity
                 //When grounded, take the Vector3.Project() of the intended velocity against gravity direction, and of actual velocity against gravity direction. 
                 //Then take intended velocity -intendedProjected + actualProjected, and make that the actual velocity
             }
