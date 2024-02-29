@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Movement.Components;
 using Assets.Scripts.Movement.Inputs;
+using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
@@ -16,14 +17,15 @@ namespace Assets.Scripts.Movement
         private InputReader inputReader = new();
         private FixedInput input = new();
 
+        // velocity per second
         public Vector3 Velocity { get; set; } = new();
         public Vector3 PreviousVelocity { get; private set; } = new();
         public Vector3 PreviousPosition { get; private set; } = new();
 
         // stuff from controller, move I guess
-        public Vector3 ActualVelocity { get { return characterController.velocity; } }
+        //public Vector3 ActualVelocity { get { return characterController.velocity; } }
         public bool IsGrounded { get { return characterController.isGrounded; } }
-        public Collider GroundedCollider { get { return null; } }
+        //public Collider GroundedCollider { get { throw new NotImplementedException("GroundedCollider"); } }
         public Vector3 GroundedNormal { get { return characterController.groundedNormal; } }
         public float SlopeAngle { get { return characterController.slopeAngle; } }
 

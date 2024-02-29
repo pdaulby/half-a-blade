@@ -5,22 +5,30 @@ namespace Assets.Scripts.Movement.Inputs
 {
     public class InputReader // maybe should be monobehaviour
     {
-        public FixedInput input = new();
+        private InputConfig config = new()
+        {
+            MaxZone = 0.9f,
+            DeadZone = 0.2f
+        };
+
+        float forward;
+        float right;
+        Pressable jump = new();
                 
         public void Update()
         {
-            input.Jump.Held = Input.GetKey(KeyCode.Space);
-            input.Jump.Press(Input.GetKeyDown(KeyCode.Space));
-            input.Jump.Release(Input.GetKeyUp(KeyCode.Space));
+            jump.Held = Input.GetKey(KeyCode.Space);
+            jump.Press(Input.GetKeyDown(KeyCode.Space));
+            jump.Release(Input.GetKeyUp(KeyCode.Space));
 
-            input.Forward = Input.GetAxisRaw("Vertical");
-            input.Right = Input.GetAxisRaw("Horizontal");
+            forward = Input.GetAxisRaw("Vertical");
+            right = Input.GetAxisRaw("Horizontal");
         }
         
         public FixedInput GetNext()
         {
-            var next = input;
-            input = input.Next();
+            var next = new FixedInput(config, forward, right, jump) ;
+            jump = jump.Next();
             return next;
         }
     }

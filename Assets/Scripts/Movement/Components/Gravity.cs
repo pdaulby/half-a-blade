@@ -11,9 +11,9 @@ namespace Assets.Scripts.Movement.Components
 
         public override void DoUpdate(FixedInput input, PlayerController controller)
         {
-            Debug.Log(controller.IsGrounded);
             if (controller.IsGrounded)
             {
+                //TODO handle ground collisions elsewhere perhaps?
                 controller.Velocity -= Vector3.Dot(controller.Velocity, controller.GroundedNormal) * controller.GroundedNormal;
             }
 

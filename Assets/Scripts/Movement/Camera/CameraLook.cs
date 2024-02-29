@@ -17,6 +17,7 @@ namespace Assets.Scripts.Movement.Components
 
         void Update()
         {
+            //TODO this isn't part of the inputs or anything, come on now
             float turnLeftRight = Input.GetAxisRaw("Mouse X") * mouseSensitivityHorz;
             float lookUpDown = Input.GetAxisRaw("Mouse Y") * mouseSensitivityVert;
 

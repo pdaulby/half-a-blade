@@ -9,6 +9,7 @@ namespace Assets.Scripts.Movement.Inputs
         public bool Pressed { get; private set; }
         public bool Released { get; private set; }
 
+        //TODO make a separate readonly pressable and a pressable reader
         public Pressable Next()
         {
             return new Pressable { Held = Held };
