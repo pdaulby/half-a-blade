@@ -10,9 +10,9 @@ namespace Assets.Scripts.Movement.Components
         [SerializeField] protected ActiveWhen Grounded;
 
         [DrawIf("Grounded", ActiveWhen.IsTrue, ComparisonType.Equals)]
-        [SerializeField] protected float SlopeMin; //inclusive
+        [SerializeField] protected float SlopeMin = 0; //inclusive
         [DrawIf("Grounded", ActiveWhen.IsTrue, ComparisonType.Equals)]
-        [SerializeField] private float SlopeMax; //exclusive
+        [SerializeField] private float SlopeMax = 90; //exclusive
         private void Start()
         {
             
