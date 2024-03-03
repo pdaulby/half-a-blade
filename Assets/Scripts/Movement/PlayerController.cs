@@ -47,7 +47,6 @@ namespace Assets.Scripts.Movement
             components.Where(c => c.CanUse(this)).ToList()
                 .ForEach(c => c.DoUpdate(input, this));
 
-            Debug.Log(Velocity);
             characterController.Move(Velocity * Time.deltaTime);
             PreviousVelocity = Velocity;
         }

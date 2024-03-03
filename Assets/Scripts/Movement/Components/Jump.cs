@@ -15,7 +15,7 @@ namespace Assets.Scripts.Movement.Components
             if (controller.IsGrounded)
             {
                 Debug.Log("jump");
-                controller.Velocity += controller.transform.up * jump;
+                controller.Velocity += controller.orientation.up * jump;
             }
             //todo slope limit
             //todo use proper up

@@ -119,7 +119,6 @@ namespace Assets.Scripts.Movement
             _translation = m_position - startPosition;
             _translation -= stepTranslation;
             velocity = _translation / Time.deltaTime;
-
             // Causes some strange behaviour - nested objects getting out of sync
             // Might be due to nested rigidbodies
             // rb.MovePosition(m_position);

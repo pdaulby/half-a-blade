@@ -11,10 +11,11 @@ namespace Assets.Scripts.Movement.Components
 
         public override void DoUpdate(FixedInput input, PlayerController controller)
         {
+
+            Debug.DrawLine(transform.position, transform.position + controller.Velocity, Color.red, 1);
             if (controller.IsGrounded)
             {
-                //TODO handle ground collisions elsewhere perhaps?
-                controller.Velocity -= Vector3.Dot(controller.Velocity, controller.GroundedNormal) * controller.GroundedNormal;
+                //hmm
             }
 
             controller.Velocity += gravity * Time.deltaTime * gravityDirection;
