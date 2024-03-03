@@ -5,6 +5,7 @@ namespace Assets.Scripts.Movement
 {
     public class KinematicBody3 : MonoBehaviour
     {
+        public Transform orientation;
         public new Collider collider = default;
         public float slopeLimit = 45f;
         public float stepOffset = 0.3f;
@@ -18,7 +19,7 @@ namespace Assets.Scripts.Movement
         public Vector3 overlapCenter = new Vector3();
         public float overlapRadius = 1f;
 
-        private Vector3 m_upDirection;
+        private Vector3 m_upDirection { get { return orientation.up; } }
 
         // Maximum number of detectable collisions.
         // If collisions are missing, reduce the overlap radius!
@@ -76,7 +77,7 @@ namespace Assets.Scripts.Movement
             //Initialise variables
             
             startPosition = rb.position;
-            m_upDirection = transform.up;
+            //m_upDirection = transform.up;
             _translation = translation;
             stepTranslation = Vector3.zero;
             isGrounded = false;

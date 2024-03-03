@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Movement.Inputs;
+using System;
 using UnityEngine;
 
 namespace Assets.Scripts.Movement.Components
@@ -7,9 +8,9 @@ namespace Assets.Scripts.Movement.Components
     {
         public override void DoUpdate(FixedInput input, PlayerController controller)
         {
-            if (controller.IsGrounded)
+            if (!controller.IsGrounded) throw new Exception("Only when grounded");
+            if (Vector3.Dot(controller.Velocity, controller.GroundedNormal) < 0)
             {
-                //TODO only if its upwards, not downwards
                 controller.Velocity -= Vector3.Dot(controller.Velocity, controller.GroundedNormal) * controller.GroundedNormal;
                 //controller.Velocity = Vector3.ProjectOnPlane(controller.Velocity, controller.GroundedNormal);
             }

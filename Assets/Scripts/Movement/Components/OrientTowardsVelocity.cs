@@ -10,6 +10,7 @@ public class OrientTowardsVelocity : ControllerComponent
     
     public override void DoUpdate(FixedInput input, PlayerController controller)
         {
+            if (controller.Velocity.magnitude < 0.5f) return;
             //todo ACUTE turns
             Quaternion lookRotation = Quaternion.LookRotation(controller.Velocity);
             controller.orientation.rotation = Quaternion.Slerp(controller.orientation.rotation, lookRotation, turnSpeed * Time.deltaTime);
