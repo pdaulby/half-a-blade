@@ -26,7 +26,6 @@ namespace Assets.Scripts.Movement
         private readonly Collider[] m_overlaps = new Collider[20];
 
         private const int MaxSweepSteps = 5;
-        private const float MinMoveDistance = 0f;
 
         private Vector3 _translation = default;
         public bool isGrounded { get; private set; }
@@ -39,8 +38,6 @@ namespace Assets.Scripts.Movement
         public bool stepped { get; private set; }
         private Vector3 stepTranslation;
 
-        public bool isOnSlope { get; private set; }
-        public Vector3 slopeNormal { get; private set; }
         public float slopeAngle { get; private set; }
 
         private Rigidbody rb;
@@ -72,31 +69,15 @@ namespace Assets.Scripts.Movement
 
         public void Move(Vector3 translation)
         {
-            Vector3 startPosition;
-
             //Initialise variables
-            
-            startPosition = rb.position;
+            Vector3 startPosition = rb.position;
             _translation = translation;
             stepTranslation = Vector3.zero;
             isGrounded = false;
-            isOnSlope = false;
             stepped = false;
 
-            // If we are not rising, we can set grounded at the start which is useful in CapsuleSweep
-            // (in addition, we set grounded based on all collisions post movement step)
-            // (not sure that part is necessary or helpful!)
-            if (_translation.y <= 0)
-            {
-                if (rb.SweepTest(-orientation.up, out RaycastHit hit, skinWidth + 0.01f, QueryTriggerInteraction.Ignore))
-                {
-                    SetGroundedAndSlopeState(hit.normal);
-                }
-            }
-            
-
             //Collide and Slide
-            if (_translation.sqrMagnitude > MinMoveDistance)
+            if (translation != Vector3.zero)
             {
                 Vector3 localTranslation = orientation.InverseTransformDirection(_translation);
                 Vector3 lateralTranslation = new Vector3(localTranslation.x, 0, localTranslation.z);
@@ -119,10 +100,11 @@ namespace Assets.Scripts.Movement
             _translation = m_position - startPosition;
             _translation -= stepTranslation;
             velocity = _translation / Time.deltaTime;
+            Debug.Log(velocity.magnitude);
             // Causes some strange behaviour - nested objects getting out of sync
             // Might be due to nested rigidbodies
-            // rb.MovePosition(m_position);
-            rb.position = m_position;
+            rb.MovePosition(m_position);
+            //rb.position = m_position;
         }
 
         public void Depenetrate()
@@ -185,12 +167,6 @@ namespace Assets.Scripts.Movement
             {
                 isGrounded = true;
                 groundedNormal = contactNormal;
-            }
-            else if (slopeAngle >= slopeLimit && slopeAngle < 90)
-            {
-                Debug.Log("idk");
-                isOnSlope = true;
-                slopeNormal = contactNormal;
             }
             else
                 Debug.Log($"other, angle {slopeAngle}, limit {slopeLimit}");
@@ -268,8 +244,10 @@ namespace Assets.Scripts.Movement
                         collision && Vector3.Angle(m_upDirection, hitInfo.normal) < slopeLimit;
                     bool stepWentHigher = stepDownCollision && stepDownHitInfo.distance < nudgeUpDistance;
 
-                    doStep =
-                        !walkHitShallowSlope
+                    //Debug.Log($" {!stepRaisedHitSteepSlope}  {!stepDownHitSteepSlope} {stepRaisedAvoidedCollision} {stepCollidedFurther}");
+
+                    doStep = true 
+                        && !walkHitShallowSlope
                         && !stepRaisedHitSteepSlope
                         && stepWentHigher
                         && !stepDownHitSteepSlope
@@ -277,6 +255,7 @@ namespace Assets.Scripts.Movement
 
                     if (doStep)
                     {
+                        Debug.Log("wow");
                         stepTranslation += orientation.up * stepOffset;
                         stepped = true;
                     }
@@ -300,7 +279,7 @@ namespace Assets.Scripts.Movement
                 //Clamp rigibody back down if necessary
                 float downDistance = 0;
 
-                if (isGrounded && !isOnSlope)
+                if (isGrounded)
                 {
                     downDistance += snapToFloorOffset;
                 }

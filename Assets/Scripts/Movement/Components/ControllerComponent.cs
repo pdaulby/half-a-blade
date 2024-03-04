@@ -14,6 +14,11 @@ namespace Assets.Scripts.Movement.Components
         [DrawIf("Grounded", ActiveWhen.IsTrue, ComparisonType.Equals)]
         [SerializeField] private float SlopeMax = 90; //exclusive
 
+        public void Start()
+        {
+            //this is here just for the enabled button
+        }
+
         public virtual bool CanUse(PlayerController controller)
         {
             if (!enabled) return false;
