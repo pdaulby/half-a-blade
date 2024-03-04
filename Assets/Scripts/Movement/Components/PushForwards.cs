@@ -6,7 +6,8 @@ namespace Assets.Scripts.Movement.Components
 {
 public class PushForwards : ControllerComponent
 {
-    public AnimationCurve pushStrength;
+    public float max = 14;
+    public float pushStrength = 2;
 
     public float frequency = 1;
 
@@ -17,10 +18,10 @@ public class PushForwards : ControllerComponent
         {
             if (input.Forward < 0.5) return;
             if (lastPush + frequency > Time.time) return;
+            if (controller.Velocity.magnitude > max) return;
             lastPush = Time.time;
-            float x = pushStrength.Evaluate(controller.Velocity.magnitude);
             
-            controller.Velocity += controller.orientation.forward * x;
+            controller.Velocity += controller.orientation.forward * pushStrength;
         }
 }
 }

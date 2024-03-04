@@ -88,7 +88,7 @@ namespace Assets.Scripts.Movement
             // (not sure that part is necessary or helpful!)
             if (_translation.y <= 0)
             {
-                if (rb.SweepTest(Vector3.down, out RaycastHit hit, skinWidth + 0.01f, QueryTriggerInteraction.Ignore))
+                if (rb.SweepTest(-orientation.up, out RaycastHit hit, skinWidth + 0.01f, QueryTriggerInteraction.Ignore))
                 {
                     SetGroundedAndSlopeState(hit.normal);
                 }
@@ -181,7 +181,6 @@ namespace Assets.Scripts.Movement
         private void SetGroundedAndSlopeState(Vector3 contactNormal)
         {
             slopeAngle = Vector3.Angle(m_upDirection, contactNormal);
-
             if (slopeAngle <= slopeLimit)
             {
                 isGrounded = true;
@@ -189,9 +188,12 @@ namespace Assets.Scripts.Movement
             }
             else if (slopeAngle >= slopeLimit && slopeAngle < 90)
             {
+                Debug.Log("idk");
                 isOnSlope = true;
                 slopeNormal = contactNormal;
             }
+            else
+                Debug.Log($"other, angle {slopeAngle}, limit {slopeLimit}");
         }
 
         public void CapsuleSweep(SweepType sweepType, Vector3 direction, float remainingDistance)
@@ -240,7 +242,7 @@ namespace Assets.Scripts.Movement
                     if (nudgeUpHitInfo.collider != null)
                         nudgeUpDistance = nudgeUpHitInfo.distance - skinWidth;
 
-                    rb.position += Vector3.up * nudgeUpDistance;
+                    rb.position += orientation.up * nudgeUpDistance;
                     preSweepPositionStep = rb.position;
 
                     // While raised, do we collide with anything?
@@ -275,7 +277,7 @@ namespace Assets.Scripts.Movement
 
                     if (doStep)
                     {
-                        stepTranslation += Vector3.up * stepOffset;
+                        stepTranslation += orientation.up * stepOffset;
                         stepped = true;
                     }
                 }
@@ -310,14 +312,14 @@ namespace Assets.Scripts.Movement
 
                 if (downDistance > 0)
                 {
-                    if (rb.SweepTest(Vector3.down,  out RaycastHit clampDownHitInfo, downDistance, QueryTriggerInteraction.Ignore)
+                    if (rb.SweepTest(-orientation.up,  out RaycastHit clampDownHitInfo, downDistance, QueryTriggerInteraction.Ignore)
                         // Don't clamp if steep slope!
                         && Vector3.Angle(m_upDirection, clampDownHitInfo.normal) < slopeLimit)
                     {
                         downDistance = Mathf.Max(0, clampDownHitInfo.distance - skinWidth);
-                        rb.position += Vector3.down * downDistance;
+                        rb.position += -orientation.up * downDistance;
 
-                        stepTranslation += Vector3.down * downDistance;
+                        stepTranslation += -orientation.up * downDistance;
                     }
                     else
                     {
@@ -367,7 +369,7 @@ namespace Assets.Scripts.Movement
             // (i.e. force the final direction to align with players input direction)
             if (sweepType == SweepType.LATERAL && surfaceAngle < 90)
             {
-                projectionNormal = KinematicBodyMath.RelativeSlopeNormal(direction.Horizontal(), hitInfo.normal);
+                projectionNormal = KinematicBodyMath.RelativeSlopeNormal(direction.Horizontal(), hitInfo.normal, orientation.up);
             }
 
             // Do even more fancy things if it's a "blocking" surface
@@ -381,7 +383,7 @@ namespace Assets.Scripts.Movement
                     // Ground / Slope case: figure out the plane lines up the direction
                     // with the seam between ground and slope
                     if (isGrounded
-                        && Vector3.Angle(hitInfo.normal, Vector3.up) < 90
+                        && Vector3.Angle(hitInfo.normal, orientation.up) < 90
                         // If same normal is hit twice, the seam algorithm is stuck
                         // So try to just default projectionNormal
                         // (happens at the top of slopes)
@@ -389,12 +391,12 @@ namespace Assets.Scripts.Movement
                             || lastUsedHitInfo.normal != hitInfo.normal))
                     {
                         var seam = Vector3.Cross(hitInfo.normal, groundedNormal);
-                        projectionNormal = new Plane(Vector3.zero, seam, seam + Vector3.up).normal;
+                        projectionNormal = new Plane(Vector3.zero, seam, seam + orientation.up).normal;
                     }
                     // Ceiling / Ground squeeze case: figure out the plane that lines up the direction
                     // Out of a ground and ceiling that are squeezing together
                     else if (isGrounded
-                        && Vector3.Angle(hitInfo.normal, Vector3.up) > 90
+                        && Vector3.Angle(hitInfo.normal, orientation.up) > 90
                         // Same as above; I'm less confident about how this happens
                         // but it seemed to smooth things out
                         && (lastUsedHitInfo.collider == null
@@ -406,7 +408,7 @@ namespace Assets.Scripts.Movement
                         // Apply that to the ceiling; work out the appropriate plane,
                         // Then rotate it back.
                         // I'm not totally confident in it
-                        var rotation = Quaternion.FromToRotation(groundedNormal, Vector3.up);
+                        var rotation = Quaternion.FromToRotation(groundedNormal, orientation.up);
                         var rotatedHitNormal = rotation * hitInfo.normal;
                         projectionNormal = new Vector3(rotatedHitNormal.x, 0, rotatedHitNormal.z);
                         projectionNormal = Quaternion.Inverse(rotation) * projectionNormal;
@@ -415,7 +417,7 @@ namespace Assets.Scripts.Movement
                 // For vertical sweeps, just block any downward movement when on a slope
                 if (sweepType == SweepType.VERTICAL)
                 {
-                    projectionNormal = Vector3.up;
+                    projectionNormal = orientation.up;
                 }
             }
 
@@ -440,9 +442,9 @@ namespace Assets.Scripts.Movement
 
         public bool SetYScalePosition(float newYScale, float newYPosition, bool force = false)
         {
-            bool didDownHit = rb.SweepTest(Vector3.down, out RaycastHit downHit);
+            bool didDownHit = rb.SweepTest(-orientation.up, out RaycastHit downHit);
 
-            bool didUpHit = rb.SweepTest(Vector3.up, out RaycastHit upHit);
+            bool didUpHit = rb.SweepTest(orientation.up, out RaycastHit upHit);
 
             Vector3 oldboundMin = collider.bounds.min;
 

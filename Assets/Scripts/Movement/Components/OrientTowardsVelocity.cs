@@ -12,7 +12,7 @@ public class OrientTowardsVelocity : ControllerComponent
         {
             if (controller.Velocity.magnitude < 0.5f) return;
             //todo ACUTE turns
-            Quaternion lookRotation = Quaternion.LookRotation(controller.Velocity);
+            Quaternion lookRotation = Quaternion.LookRotation(controller.Velocity, controller.IsGrounded ? controller.GroundedNormal : controller.orientation.up);
             controller.orientation.rotation = Quaternion.Slerp(controller.orientation.rotation, lookRotation, turnSpeed * Time.deltaTime);
              
         }

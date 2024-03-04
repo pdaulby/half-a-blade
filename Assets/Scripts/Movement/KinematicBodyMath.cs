@@ -5,31 +5,16 @@ namespace Assets.Scripts.Movement
 {
     public class KinematicBodyMath : MonoBehaviour
     {
-        public static Vector3 SlopeNormalToDownSlope(Vector3 slopeNormal)
-        {
-            return SlopeNormalToDownSlope(slopeNormal, Vector3.up);
-        }
 
         public static Vector3 SlopeNormalToDownSlope(Vector3 slopeNormal, Vector3 up)
         {
             return Vector3.RotateTowards(slopeNormal, -up, Mathf.PI / 2, 0);
         }
 
-        public static Vector3 RelativeSlopeNormal(Vector3 horizontal, Vector3 slopeNormal)
-        {
-            return RelativeSlopeNormal(horizontal, slopeNormal, Vector3.up);
-        }
-
-        // Private - not sure if a custom up vector works! Let's see :)
-        private static Vector3 RelativeSlopeNormal(Vector3 horizontal, Vector3 slopeNormal, Vector3 up)
+        public static Vector3 RelativeSlopeNormal(Vector3 horizontal, Vector3 slopeNormal, Vector3 up)
         {
             Vector3 slopeVector = HorizontalToSlopeGradient(horizontal, slopeNormal, up);
             return Vector3.SlerpUnclamped(slopeVector, up, 90 / Vector3.Angle(slopeVector, up)).normalized;
-        }
-
-        private static Vector3 HorizontalToSlopeGradient(Vector3 horizontal, Vector3 slopeNormal)
-        {
-            return HorizontalToSlopeGradient(horizontal, slopeNormal, Vector3.up);
         }
 
         // Private - not sure if a custom up vector works! Let's see :)
