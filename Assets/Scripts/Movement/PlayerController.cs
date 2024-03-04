@@ -29,6 +29,14 @@ namespace Assets.Scripts.Movement
         public Vector3 GroundedNormal { get { return characterController.groundedNormal; } }
         public float SlopeAngle { get { return characterController.slopeAngle; } }
 
+
+        public float Gravity = 9.8f;
+        public Vector3 GravityDirection { get; private set; } = Vector3.down;
+        public void SetGravityDirection(Vector3 direction)
+        {
+            GravityDirection = direction.normalized;
+        }
+
         private void Awake()
         {
             components = GetComponents<ControllerComponent>();
@@ -49,6 +57,8 @@ namespace Assets.Scripts.Movement
 
             characterController.Move(Velocity * Time.deltaTime);
             PreviousVelocity = Velocity;
+
+            Debug.DrawLine(transform.position, transform.position + Velocity, Color.red, 1);
         }
     }
 }

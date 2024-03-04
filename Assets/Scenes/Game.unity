@@ -1282,7 +1282,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &231871059
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5857,9 +5857,8 @@ GameObject:
   - component: {fileID: 1458030261}
   - component: {fileID: 1458030262}
   - component: {fileID: 1458030263}
-  - component: {fileID: 1458030266}
   - component: {fileID: 1458030264}
-  - component: {fileID: 1458030265}
+  - component: {fileID: 1458030268}
   m_Layer: 0
   m_Name: CharacterController
   m_TagString: Untagged
@@ -5896,6 +5895,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   orientation: {fileID: 4819750369556972332}
   characterController: {fileID: 4819750370334471337}
+  Gravity: 9.8
 --- !u!114 &1458030261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5911,7 +5911,6 @@ MonoBehaviour:
   Grounded: 0
   SlopeMin: 0
   SlopeMax: 0
-  gravity: 9.8
 --- !u!114 &1458030262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5963,38 +5962,6 @@ MonoBehaviour:
   SlopeMax: 360
   turnSpeed: 3
   turnVelocity: 1
---- !u!114 &1458030265
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1458030257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8ad72ff808e54e95bb3cef947a992f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Grounded: 1
-  SlopeMin: 0
-  SlopeMax: 360
-  turnSpeed: 10
---- !u!114 &1458030266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1458030257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08df71089580e442fab4a4dbf4c0a208, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Grounded: 1
-  SlopeMin: 0
-  SlopeMax: 360
-  turnSpeed: 11
 --- !u!114 &1458030267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6010,6 +5977,23 @@ MonoBehaviour:
   Grounded: 1
   SlopeMin: 0
   SlopeMax: 360
+--- !u!114 &1458030268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458030257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8ad72ff808e54e95bb3cef947a992f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Grounded: 1
+  SlopeMin: 0
+  SlopeMax: 360
+  turnSpeed: 10
+  OrientUp: 2
 --- !u!1 &1465969149
 GameObject:
   m_ObjectHideFlags: 0

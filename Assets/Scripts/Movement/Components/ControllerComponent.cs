@@ -13,10 +13,7 @@ namespace Assets.Scripts.Movement.Components
         [SerializeField] protected float SlopeMin = 0; //inclusive
         [DrawIf("Grounded", ActiveWhen.IsTrue, ComparisonType.Equals)]
         [SerializeField] private float SlopeMax = 90; //exclusive
-        private void Start()
-        {
-            
-        }
+
         public virtual bool CanUse(PlayerController controller)
         {
             if (!enabled) return false;
