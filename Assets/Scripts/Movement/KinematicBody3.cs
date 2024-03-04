@@ -178,9 +178,9 @@ namespace Assets.Scripts.Movement
             Vector3 preSweepPositionGround;
             Vector3 preSweepPositionStep = default;
             bool collision;
+            bool wasCollision = false;
             bool stepRaisedCollision;
             bool stepDownCollision;
-
 
             for (int i = 0; i < MaxSweepSteps; i++)
             {
@@ -190,7 +190,7 @@ namespace Assets.Scripts.Movement
 
                 preSweepPositionGround = rb.position;
                 collision = rb.SweepTest(direction.normalized, out RaycastHit hitInfo, remainingDistance + skinWidth, QueryTriggerInteraction.Ignore);
-
+                wasCollision = wasCollision || collision;
                 // The Step algorithm nudges the character up; let's the character move; then nudes them back down
                 // It only makes sense for lateral movement
                 // Realistically it's a half implemented 1 iteration version of IterateMovement; so it should be there.
@@ -224,33 +224,24 @@ namespace Assets.Scripts.Movement
                     rb.position += direction.normalized * remainingDistance;
                     stepDownCollision = rb.SweepTest(-m_upDirection, out RaycastHit stepDownHitInfo, stepOffset + skinWidth, QueryTriggerInteraction.Ignore);
 
-                    bool stepRaisedAvoidedCollision = !stepRaisedCollision && collision;
                     bool stepCollidedFurther = stepRaisedCollision
-                        && collision
+                        && collision 
                         && stepRaisedHitInfo.distance > hitInfo.distance + 0.001;
-                    bool stepRaisedHitSteepSlope = stepRaisedCollision
-                        && Vector3.Angle(m_upDirection, stepRaisedHitInfo.normal) >= slopeLimit;
-                    bool stepDownHitSteepSlope =  stepDownCollision
-                        && Vector3.Angle(m_upDirection, stepDownHitInfo.normal) >= slopeLimit;
-                    bool walkHitShallowSlope =
-                        collision && Vector3.Angle(m_upDirection, hitInfo.normal) < slopeLimit;
                     bool stepWentHigher = stepDownCollision && stepDownHitInfo.distance < nudgeUpDistance;
 
-                    //Debug.Log($" {!stepRaisedHitSteepSlope}  {!stepDownHitSteepSlope} {stepRaisedAvoidedCollision} {stepCollidedFurther}");
-
                     doStep = true 
-                        && !walkHitShallowSlope
-                        && !stepRaisedHitSteepSlope
                         && stepWentHigher
-                        && !stepDownHitSteepSlope
-                        && (stepRaisedAvoidedCollision || stepCollidedFurther);
+                        && stepCollidedFurther;
 
                     if (doStep)
                     {
-                        Debug.Log("wow");
+                        Debug.Log($"{stepDownCollision} && {stepDownHitInfo.distance} < {nudgeUpDistance}");
+                        
                         stepTranslation += orientation.up * stepOffset;
                         stepped = true;
-                    }
+                    } 
+                    else Debug.Log($"{stepWentHigher} {stepCollidedFurther})");
+
                 }
 
                 // Do the movement
