@@ -175,19 +175,12 @@ namespace Assets.Scripts.Movement
         {
             Vector3 initialDirection = direction;
             RaycastHit stepRaisedHitInfo = default;
-            RaycastHit lastUsedHitInfo = default;
             Vector3 preSweepPositionGround;
             Vector3 preSweepPositionStep = default;
             bool collision;
             bool stepRaisedCollision;
             bool stepDownCollision;
 
-            //For Vertical, blocking angle is between 0 - slopeLimit
-            //For Lateral, blocking angle is slopeLimit - 90 (grounded) or 360 (not grounded)
-            float minBlockAngle = sweepType == SweepType.LATERAL ? slopeLimit : 0;
-            float maxBlockAngle = slopeLimit;
-            if (sweepType == SweepType.LATERAL)
-                maxBlockAngle = isGrounded ? 360 : 90;
 
             for (int i = 0; i < MaxSweepSteps; i++)
             {
@@ -264,16 +257,10 @@ namespace Assets.Scripts.Movement
                 RaycastHit iterationUsingHitInfo = doStep ? stepRaisedHitInfo : hitInfo;
                 rb.position = doStep ? preSweepPositionStep : preSweepPositionGround; // If stepping it's already in the right place
                 float lastIterationDistance = IterateMovement(
-                    sweepType,
                     iterationUsingHitInfo,
-                    lastUsedHitInfo,
                     initialDirection,
                     ref direction,
-                    ref remainingDistance,
-                    minBlockAngle,
-                    maxBlockAngle
-                );
-                lastUsedHitInfo = iterationUsingHitInfo;
+                    ref remainingDistance);
                 
                 //Clamp rigibody back down if necessary
                 float downDistance = 0;
@@ -310,14 +297,10 @@ namespace Assets.Scripts.Movement
         }
 
         private float IterateMovement(
-            SweepType sweepType,
             RaycastHit hitInfo,
-            RaycastHit lastUsedHitInfo,
             Vector3 initialDirection,
             ref Vector3 direction,
-            ref float distance,
-            float minBlockAngle,
-            float maxBlockAngle)
+            ref float distance)
         {
             // How much it is possible to move without hitting the next collider (if next collider even exists)
             float safeDistance = distance;
@@ -340,60 +323,6 @@ namespace Assets.Scripts.Movement
             // If there was a next collider; figure out what the next direction will be
             // Default: project direction straight into the plane of the hit surface
             Vector3 projectionNormal = hitInfo.normal;
-
-            float surfaceAngle = Vector3.Angle(m_upDirection, hitInfo.normal) - 0.001f;
-
-            // Do even more fancy things if it's a "blocking" surface
-            if ((surfaceAngle >= minBlockAngle) && (surfaceAngle <= maxBlockAngle))
-            {
-                if (sweepType == SweepType.LATERAL)
-                {
-                    Debug.LogError("this doesn't seem possible anymore");
-                    // Default for blocking slope is to "wall off" along the slope
-                    projectionNormal = new Vector3(hitInfo.normal.x, 0, hitInfo.normal.z);
-
-                    // Ground / Slope case: figure out the plane lines up the direction
-                    // with the seam between ground and slope
-                    if (isGrounded
-                        && Vector3.Angle(hitInfo.normal, orientation.up) < 90
-                        // If same normal is hit twice, the seam algorithm is stuck
-                        // So try to just default projectionNormal
-                        // (happens at the top of slopes)
-                        && (lastUsedHitInfo.collider == null
-                            || lastUsedHitInfo.normal != hitInfo.normal))
-                    {
-                        var seam = Vector3.Cross(hitInfo.normal, groundedNormal);
-                        projectionNormal = new Plane(Vector3.zero, seam, seam + orientation.up).normal;
-                    }
-                    // Ceiling / Ground squeeze case: figure out the plane that lines up the direction
-                    // Out of a ground and ceiling that are squeezing together
-                    else if (isGrounded
-                        && Vector3.Angle(hitInfo.normal, orientation.up) > 90
-                        // Same as above; I'm less confident about how this happens
-                        // but it seemed to smooth things out
-                        && (lastUsedHitInfo.collider == null
-                            || lastUsedHitInfo.normal != hitInfo.normal))
-                    {
-                        // Experimental algorithm: I noticed that when the floor is flat
-                        // Squeezing ceilings work correctly
-                        // So when the floor is not flat, figure out what rotation would make it so,
-                        // Apply that to the ceiling; work out the appropriate plane,
-                        // Then rotate it back.
-                        // I'm not totally confident in it
-                        var rotation = Quaternion.FromToRotation(groundedNormal, orientation.up);
-                        var rotatedHitNormal = rotation * hitInfo.normal;
-                        projectionNormal = new Vector3(rotatedHitNormal.x, 0, rotatedHitNormal.z);
-                        projectionNormal = Quaternion.Inverse(rotation) * projectionNormal;
-                    }
-
-                    Debug.Log($"{isGrounded} {Vector3.Angle(hitInfo.normal, orientation.up)}");
-                }
-                // For vertical sweeps, just block any downward movement when on a slope
-                if (sweepType == SweepType.VERTICAL)
-                {
-                    projectionNormal = orientation.up;
-                }
-            }
 
             /**
             * A bit confusing, I think!
