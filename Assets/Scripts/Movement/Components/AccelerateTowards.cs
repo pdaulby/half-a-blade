@@ -1,8 +1,5 @@
 using Assets.Scripts.Movement.Components;
 using Assets.Scripts.Movement.Inputs;
-using Assets.Scripts.Movement;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Movement.Components
