@@ -77,7 +77,6 @@ namespace Assets.Scripts.Movement
             //Initialise variables
             
             startPosition = rb.position;
-            //m_upDirection = transform.up;
             _translation = translation;
             stepTranslation = Vector3.zero;
             isGrounded = false;
@@ -99,12 +98,12 @@ namespace Assets.Scripts.Movement
             //Collide and Slide
             if (_translation.sqrMagnitude > MinMoveDistance)
             {
-                Vector3 localTranslation = transform.InverseTransformDirection(_translation);
+                Vector3 localTranslation = orientation.InverseTransformDirection(_translation);
                 Vector3 lateralTranslation = new Vector3(localTranslation.x, 0, localTranslation.z);
                 Vector3 verticalTranslation = new Vector3(0, localTranslation.y, 0);
 
-                lateralTranslation = transform.TransformDirection(lateralTranslation);
-                verticalTranslation = transform.TransformDirection(verticalTranslation);
+                lateralTranslation = orientation.TransformDirection(lateralTranslation);
+                verticalTranslation = orientation.TransformDirection(verticalTranslation);
 
                 CapsuleSweep(SweepType.LATERAL, lateralTranslation.normalized, lateralTranslation.magnitude);
 
