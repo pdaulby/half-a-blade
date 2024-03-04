@@ -100,7 +100,6 @@ namespace Assets.Scripts.Movement
             _translation = m_position - startPosition;
             _translation -= stepTranslation;
             velocity = _translation / Time.deltaTime;
-            Debug.Log(velocity.magnitude);
             // Causes some strange behaviour - nested objects getting out of sync
             // Might be due to nested rigidbodies
             rb.MovePosition(m_position);
@@ -344,18 +343,12 @@ namespace Assets.Scripts.Movement
 
             float surfaceAngle = Vector3.Angle(m_upDirection, hitInfo.normal) - 0.001f;
 
-            // If hitting a slope actually use the plane adjusted for the players direction
-            // (i.e. force the final direction to align with players input direction)
-            if (sweepType == SweepType.LATERAL && surfaceAngle < 90)
-            {
-                projectionNormal = KinematicBodyMath.RelativeSlopeNormal(direction.Horizontal(), hitInfo.normal, orientation.up);
-            }
-
             // Do even more fancy things if it's a "blocking" surface
             if ((surfaceAngle >= minBlockAngle) && (surfaceAngle <= maxBlockAngle))
             {
                 if (sweepType == SweepType.LATERAL)
                 {
+                    Debug.LogError("this doesn't seem possible anymore");
                     // Default for blocking slope is to "wall off" along the slope
                     projectionNormal = new Vector3(hitInfo.normal.x, 0, hitInfo.normal.z);
 
@@ -392,6 +385,8 @@ namespace Assets.Scripts.Movement
                         projectionNormal = new Vector3(rotatedHitNormal.x, 0, rotatedHitNormal.z);
                         projectionNormal = Quaternion.Inverse(rotation) * projectionNormal;
                     }
+
+                    Debug.Log($"{isGrounded} {Vector3.Angle(hitInfo.normal, orientation.up)}");
                 }
                 // For vertical sweeps, just block any downward movement when on a slope
                 if (sweepType == SweepType.VERTICAL)
