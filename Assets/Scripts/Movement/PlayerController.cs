@@ -11,7 +11,7 @@ namespace Assets.Scripts.Movement
     {
         [Header("References")]
         public Transform orientation = default;
-        public KinematicBody3 characterController = default;
+        public IControlBody characterController = default;
 
         private ControllerComponent[] components;
         private InputReader inputReader = new();
@@ -27,7 +27,7 @@ namespace Assets.Scripts.Movement
         public bool IsGrounded { get { return characterController.isGrounded; } }
         //public Collider GroundedCollider { get { throw new NotImplementedException("GroundedCollider"); } }
         public Vector3 GroundedNormal { get { return characterController.groundedNormal; } }
-        public float SlopeAngle { get { return characterController.slopeAngle; } }
+        public float SlopeAngle { get { return Vector3.Angle(orientation.up, characterController.groundedNormal); } }
 
 
         public float Gravity = 9.8f;

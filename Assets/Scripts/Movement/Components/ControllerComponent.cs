@@ -12,7 +12,7 @@ namespace Assets.Scripts.Movement.Components
         [DrawIf("Grounded", ActiveWhen.IsTrue, ComparisonType.Equals)]
         [SerializeField] protected float SlopeMin = 0; //inclusive
         [DrawIf("Grounded", ActiveWhen.IsTrue, ComparisonType.Equals)]
-        [SerializeField] private float SlopeMax = 90; //exclusive
+        [SerializeField] private float SlopeMax = 360; //exclusive
 
         public void Start()
         {

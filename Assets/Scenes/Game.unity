@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18154866, g: 0.22718975, b: 0.3074077, a: 1}
+  m_IndirectSpecularColor: {r: 0.18154812, g: 0.22718883, b: 0.3074057, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2557,7 +2557,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 575042347}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.2800007, y: 2.9, z: 0}
+  m_LocalPosition: {x: -4.2800007, y: 3.1, z: 0}
   m_LocalScale: {x: 2, y: 4, z: 50}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9039,9 +9039,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   orientation: {fileID: 4819750369556972332}
   collider: {fileID: 1186493799}
-  slopeLimit: 359
-  stepOffset: 1
-  snapToFloorOffset: 0
   skinWidth: 0.04
   overlapCenter: {x: 0, y: 0, z: 0}
   overlapRadius: 3
+  interpolate: 1
